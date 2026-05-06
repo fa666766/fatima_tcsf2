@@ -169,4 +169,85 @@
             const inputs = [];
 
             subjects.forEach((s, i) => {
-                const val = parse
+                const val = parseFloat(document.getElementById(`note${i}`).value) || 0;
+                notes.push(val);
+                total += val * s.coef;
+                sumCoef += s.coef;
+                labels.push(s.name);
+                icons.push(s.icon);
+                inputs.push(val);
+            });
+
+            const moyenne = (total / sumCoef).toFixed(2);
+            const resultatDiv = document.getElementById('resultat');
+            const chartDiv = document.getElementById('chartContainer');
+            
+            let conseil = '<div id="conseil"><b>📋 التحليل والتوصيات:</b><br><br>';
+            let matieresFaibles = [];
+            let matieresFortes = [];
+            
+            notes.forEach((n, i) => {
+                if (n < 10 && n > 0) matieresFaibles.push(`${icons[i]} ${labels[i]}: ${n}/20`);
+                else if (n >= 16) matieresFortes.push(`${icons[i]} ${labels[i]}: ${n}/20`);
+            });
+            
+            if (moyenne >= 10) {
+                conseil += `🎉 <b>تهانينا! ناجح بمعدل ${moyenne}/20</b><br><br>`;
+                if (matieresFortes.length > 0) {
+                    conseil += `<span class="point-fort">🌟 نقاط القوة:</span><br>${matieresFortes.join('<br>')}<br><br>`;
+                }
+                if (matieresFaibles.length > 0) {
+                    conseil += `<span class="point-faible">⚠️ نقاط تحتاج للتحسين:</span><br>${matieresFaibles.join('<br>')}<br><br>`;
+                    conseil += `يُنصح بتخصيص وقت إضافي لمراجعة هذه المواد.<br><br>`;
+                }
+                conseil += `💡 <b>نصيحة:</b> استمر في المثابرة واستعد للسنة القادمة.`;
+            } else {
+                conseil += `😔 <b>المعدل ${moyenne}/20 غير كافٍ للنجاح</b><br><br>`;
+                if (matieresFortes.length > 0) {
+                    conseil += `<span class="point-fort">🌟 نقاط القوة:</span><br>${matieresFortes.join('<br>')}<br><br>`;
+                }
+                conseil += `<span class="point-faible">📉 المواد التي تحتاج معالجة:</span><br>${matieresFaibles.join('<br>')}<br><br>`;
+                conseil += `💪 <b>خطة العمل:</b><br>1. ركز على المواد ذات المعامل المرتفع<br>2. نظم وقتك للمراجعة<br>3. استعن بالأساتذة<br>4. لا تفقد الأمل 💜`;
+            }
+            conseil += '</div>';
+            
+            if (moyenne >= 10) {
+                resultatDiv.className = 'admis';
+                resultatDiv.innerHTML = `🎉 ناجح<br><span style="font-size:32px">${moyenne} / 20</span><br>مجموع النقط: ${total.toFixed(2)} | مجموع المعاملات: ${sumCoef}${conseil}`;
+            } else {
+                resultatDiv.className = 'refuse';
+                resultatDiv.innerHTML = `😔 راسب<br><span style="font-size:32px">${moyenne} / 20</span><br>مجموع النقط: ${total.toFixed(2)} | مجموع المعاملات: ${sumCoef}${conseil}`;
+            }
+            resultatDiv.style.display = 'block';
+            
+            chartDiv.style.display = 'block';
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.map((l,i) => `${icons[i]} ${l}`),
+                    datasets: [{
+                        label: 'النقطة / 20',
+                        data: inputs,
+                        backgroundColor: inputs.map(n => {
+                            if(n == 0) return '#ecf0f1';
+                            if(n < 10) return '#e74c3c';
+                            if(n < 12) return '#f39c12';
+                            if(n < 14) return '#f1c40f';
+                            if(n < 16) return '#2ecc71';
+                            return '#27ae60';
+                        }),
+                        borderColor: '#2c3e50',
+                        borderWidth: 3,
+                        borderRadius: 15,
+                        barThickness: 28,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {display: false},
+                       
