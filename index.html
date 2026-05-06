@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TCSF2 - Calcul Moyenne</title>
+    <title>TCSF2 - حاسبة المعدل</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -25,4 +25,148 @@
         }
         h1 {
             text-align: center;
-           
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .subject-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            transition: 0.3s;
+        }
+        .subject-row:hover {background: #e9ecef; transform: translateX(-5px);}
+        .icon {font-size: 28px; min-width: 40px;}
+        .label {flex: 1; font-weight: 600; font-size: 15px;}
+        .coef {color: #764ba2; font-weight: 700;}
+        input {
+            width: 80px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            transition: 0.3s;
+        }
+        input:focus {
+            border-color: #764ba2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(118,75,162,0.1);
+        }
+        button {
+            width: 100%;
+            padding: 18px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(118,75,162,0.4);
+        }
+        button:hover {transform: translateY(-3px); box-shadow: 0 8px 25px rgba(118,75,162,0.5);}
+        #resultat {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            display: none;
+            animation: slideIn 0.5s;
+        }
+        @keyframes slideIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        .admis {background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;}
+        .refuse {background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white;}
+        #conseil {
+            margin-top: 15px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            color: #2c3e50;
+            font-size: 15px;
+            line-height: 2;
+            text-align: right;
+        }
+        .point-fort {color: #27ae60; font-weight: 700;}
+        .point-faible {color: #e74c3c; font-weight: 700;}
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 TCSF2</h1>
+        <p class="subtitle">حاسبة المعدل الرسمي + تحليل النتائج + رسم بياني</p>
+        
+        <div id="subjects"></div>
+        
+        <button onclick="calculer()">✨ احسب المعدل وعرض التحليل</button>
+        
+        <div id="resultat"></div>
+        
+        <div id="chartContainer" style="margin-top:30px;padding:25px;background:#fff;border-radius:20px;display:none;box-shadow:0 10px 40px rgba(0,0,0,0.1)">
+            <canvas id="myChart" style="min-height:550px"></canvas>
+        </div>
+        
+        <footer>خاص بتلاميذ الجذع المشترك العلمي | 2025-2026</footer>
+    </div>
+
+    <script>
+        const subjects = [
+            {icon: '📐', name: 'الرياضيات', coef: 4},
+            {icon: '⚡', name: 'الفيزياء والكيمياء', coef: 4},
+            {icon: '🌱', name: 'علوم الحياة والأرض', coef: 4},
+            {icon: '🇫🇷', name: 'اللغة الفرنسية', coef: 3},
+            {icon: '🇬🇧', name: 'اللغة الإنجليزية', coef: 3},
+            {icon: '🕌', name: 'التربية الإسلامية', coef: 2},
+            {icon: '🌍', name: 'التاريخ والجغرافيا', coef: 2},
+            {icon: '💻', name: 'المعلوميات', coef: 2},
+            {icon: '🏃', name: 'التربية البدنية', coef: 2},
+            {icon: '🎨', name: 'الفنون التشكيلية', coef: 2}
+        ];
+
+        const subjectsDiv = document.getElementById('subjects');
+        subjects.forEach((s, i) => {
+            subjectsDiv.innerHTML += `
+                <div class="subject-row">
+                    <span class="icon">${s.icon}</span>
+                    <span class="label">${s.name} <span class="coef">(المعامل ${s.coef})</span></span>
+                    <input type="number" id="note${i}" min="0" max="20" step="0.25" placeholder="0-20">
+                </div>
+            `;
+        });
+
+        let myChart = null;
+
+        function calculer() {
+            const notes = [];
+            let total = 0;
+            let sumCoef = 0;
+            const labels = [];
+            const icons = [];
+            const inputs = [];
+
+            subjects.forEach((s, i) => {
+                const val = parse
