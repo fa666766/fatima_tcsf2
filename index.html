@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Moyenne Fatima TCSF2</title>
+    <style>
+        body{font-family:Arial;background:#667eea;padding:20px;margin:0}
+        .box{max-width:400px;margin:auto;background:white;padding:25px;border-radius:15px}
+        h1{color:#2c3e50;text-align:center;font-size:22px}
+        input{width:100%;padding:12px;margin:8px 0;border:2px solid #ddd;border-radius:8px;box-sizing:border-box}
+        button{width:100%;padding:12px;background:#3498db;color:white;border:none;border-radius:8px;font-size:18px}
+        #res{text-align:center;font-size:20px;margin-top:15px;font-weight:bold}
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>📊 حساب المعدل</h1>
+        <p style="text-align:center;color:#7f8c8d">Projet Fatima - TCSF2</p>
+        <input type="number" id="n1" placeholder="النقطة 1">
+        <input type="number" id="n2" placeholder="النقطة 2">
+        <input type="number" id="n3" placeholder="النقطة 3">
+        <button onclick="calc()">احسب المعدل</button>
+        <div id="res"></div>
+    </div>
+<script>
+function calc(){
+    let a=+n1.value||0, b=+n2.value||0, c=+n3.value||0;
+    res.innerText = 'المعدل: ' + ((a+b+c)/3).toFixed(2) + ' / 20';
+}
+</script>
+</body>
+          </html>
