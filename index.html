@@ -71,44 +71,4 @@ function getConseil(moy){
     if(moy >= 12) return `<strong>👍 Bien!</strong>C'est bien, mais tu peux faire mieux. Concentre-toi sur Maths/Physique/SVT car coef 4. Révise régulièrement.`;
     if(moy >= 10) return `<strong>✅ Admis - Assez Bien</strong>Tu passes de justesse. Attention! Il faut renforcer les matières à fort coefficient. Fais plus d'exercices.`;
     if(moy >= 8) return `<strong>⚠️ Insuffisant</strong>Il te manque ${ (10-moy).toFixed(2) } points. Travaille surtout Maths, Physique, SVT. Demande de l'aide à tes profs.`;
-    return `<strong>❌ Échec</strong>Ne te décourage pas! Identifie tes faiblesses dans les matières coef 4. Commence par des cours de soutien. Tu peux y arriver!`;
-}
-
-function calculate(){
-    const inputs = ['m1','m2','m3','m4','m5','m6','m7','m8','m9','m10'].map(id => +document.getElementById(id).value || 0);
-    const coefs = [4,4,4,3,3,2,2,2];
-    const labels = ['Maths','Physique','SVT','Français','Anglais','Arabe','Hist-Géo','Philo','Info','EPS'];
-    const icons = ['📐','⚡','🌱','🇫🇷','🇬🇧','📖','🗺️','🤔','💻','⚽'];
-    const sumCoef = 28;
-    let total = 0;
-
-    for(let i=0;i<10;i++) total += inputs[i] * coefs[i];
-    const moyenne = (total/sumCoef).toFixed(2);
-    const resultDiv = document.getElementById('result');
-    const conseil = getConseil(moyenne);
-
-    resultDiv.style.display = 'block';
-    if(moyenne >= 10){
-        resultDiv.className = 'success';
-        resultDiv.innerHTML = `
-            <div class="status">🎉 Félicitations - Admis!</div>
-            <div class="moyenne">${moyenne} / 20</div>
-            <div class="details">Total: ${total} pts | Coef: ${sumCoef}</div>
-            <div class="conseil">${conseil}</div>
-        `;
-    } else {
-        resultDiv.className = 'danger';
-        resultDiv.innerHTML = `
-            <div class="status">😔 Désolé - Ajourné</div>
-            <div class="moyenne">${moyenne} / 20</div>
-            <div class="details">Total: ${total} pts | Coef: ${sumCoef}</div>
-            <div class="conseil">${conseil}</div>
-        `;
-    }
-
-    document.getElementById('chartContainer').style.display = 'block';
-    if(myChart) myChart.destroy();
-
-    const ctx = document.getElementById('myChart');
-    const colors = inputs.map(n => {
-       
+    return `<strong>❌ Échec</strong>Ne te décourage pas! Identifie tes faiblesses dans les matières coef 4.
