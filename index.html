@@ -90,4 +90,212 @@
             animation: slideIn 0.5s;
         }
         @keyframes slideIn {
-            from {opacity
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        .admis {background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;}
+        .refuse {background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white;}
+        #conseil {
+            margin-top: 15px;
+            padding: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            color: #2c3e50;
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: right;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Fatima TCSF2</h1>
+        <p class="subtitle">حاسبة المعدل + نصائح ذكية + مبيان احترافي</p>
+        
+        <div id="subjects"></div>
+        
+        <button onclick="calculer()">✨ Calculer + Conseils + Graphique</button>
+        
+        <div id="resultat"></div>
+        
+        <div id="chartContainer" style="margin-top:30px;padding:25px;background:#fff;border-radius:20px;display:none;box-shadow:0 10px 40px rgba(0,0,0,0.1)">
+            <canvas id="myChart" style="min-height:500px"></canvas>
+        </div>
+        
+        <footer>صُنع بـ ❤️ من طرف Fatima | TCSF2 2025-2026</footer>
+    </div>
+
+    <script>
+        const subjects = [
+            {icon: '📐', name: 'Mathématiques', coef: 4},
+            {icon: '⚡', name: 'Physique-Chimie', coef: 4},
+            {icon: '🌱', name: 'SVT', coef: 4},
+            {icon: '🇫🇷', name: 'Français', coef: 3},
+            {icon: '🇬🇧', name: 'Anglais', coef: 3},
+            {icon: '🕌', name: 'Éducation Islamique', coef: 2},
+            {icon: '🌍', name: 'Histoire-Géo', coef: 2},
+            {icon: '💻', name: 'Informatique', coef: 2},
+            {icon: '🏃', name: 'EPS', coef: 2},
+            {icon: '🎨', name: 'Arts/Musique', coef: 2}
+        ];
+
+        const subjectsDiv = document.getElementById('subjects');
+        subjects.forEach((s, i) => {
+            subjectsDiv.innerHTML += `
+                <div class="subject-row">
+                    <span class="icon">${s.icon}</span>
+                    <span class="label">${s.name} <span class="coef">(Coef ${s.coef})</span></span>
+                    <input type="number" id="note${i}" min="0" max="20" step="0.25" placeholder="0-20">
+                </div>
+            `;
+        });
+
+        let myChart = null;
+
+        function calculer() {
+            const notes = [];
+            const coefs = [4,4,4,3,3,2,2,2];
+            let total = 0;
+            let sumCoef = 0;
+            const labels = [];
+            const icons = [];
+            const inputs = [];
+
+            subjects.forEach((s, i) => {
+                const val = parseFloat(document.getElementById(`note${i}`).value) || 0;
+                notes.push(val);
+                total += val * s.coef;
+                sumCoef += s.coef;
+                labels.push(s.name);
+                icons.push(s.icon);
+                inputs.push(val);
+            });
+
+            const moyenne = (total / sumCoef).toFixed(2);
+            const resultatDiv = document.getElementById('resultat');
+            const chartDiv = document.getElementById('chartContainer');
+            
+            // النصائح
+            let conseil = '<div id="conseil"><b>📋 نصائح شخصية:</b><br><br>';
+            let matieresFaibles = [];
+            let matieresFortes = [];
+            
+            notes.forEach((n, i) => {
+                if (n < 10 && n > 0) matieresFaibles.push(`${icons[i]} ${labels[i]}: ${n}/20`);
+                if (n >= 16) matieresFortes.push(`${icons[i]} ${labels[i]}: ${n}/20`);
+            });
+            
+            if (moyenne >= 10) {
+                conseil += `🎉 <b>مبروك! ناجحة بمعدل ${moyenne}/20</b><br><br>`;
+                if (matieresFortes.length > 0) {
+                    conseil += `🌟 <b>نقاط القوة:</b><br>${matieresFortes.join('<br>')}<br><br>`;
+                }
+                if (matieresFaibles.length > 0) {
+                    conseil += `⚠️ <b>خاصك تخدمي على:</b><br>${matieresFaibles.join('<br>')}<br><br>`;
+                    conseil += `💡 <b>الخطة:</b> خصصي 30 دقيقة يومياً لكل مادة ضعيفة. حلي تمارين قديمة وركزي على الأخطاء.`;
+                } else {
+                    conseil += `🔥 <b>ممتاز!</b> كاع المواد عندك فوق 10. استمري هكا وتهلاي فالباك!`;
+                }
+            } else {
+                conseil += `😔 <b>للأسف المعدل ${moyenne}/20</b><br><br>`;
+                conseil += `📉 <b>المواد الضعيفة:</b><br>${matieresFaibles.join('<br>')}<br><br>`;
+                conseil += `💪 <b>خطة الإنقاذ:</b><br>
+                1. بداي بالمواد ذات المعامل الكبير (Math, PC, SVT)<br>
+                2. سولي الأستاذ على الدروس اللي ما فهمتيش<br>
+                3. خدمي مع صحاباتك فـ groupe<br>
+                4. ما تيأسيش! باقي الوقت تداركي 💜`;
+            }
+            conseil += '</div>';
+            
+            if (moyenne >= 10) {
+                resultatDiv.className = 'admis';
+                resultatDiv.innerHTML = `🎉 Félicitations - Admis!<br><span style="font-size:32px">${moyenne} / 20</span><br>Total: ${total.toFixed(2)} pts | Coef: ${sumCoef}${conseil}`;
+            } else {
+                resultatDiv.className = 'refuse';
+                resultatDiv.innerHTML = `😔 Non Admis<br><span style="font-size:32px">${moyenne} / 20</span><br>Total: ${total.toFixed(2)} pts | Coef: ${sumCoef}${conseil}`;
+            }
+            resultatDiv.style.display = 'block';
+            
+            // المبيان الكبييير
+            chartDiv.style.display = 'block';
+            const ctx = document.getElementById('myChart').getContext('2d');
+            if (myChart) myChart.destroy();
+            
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.map((l,i) => `${icons[i]} ${l}`),
+                    datasets: [{
+                        label: 'النقطة / 20',
+                        data: inputs,
+                        backgroundColor: inputs.map(n => {
+                            if(n == 0) return '#ecf0f1';
+                            if(n < 10) return '#e74c3c';
+                            if(n < 12) return '#f39c12';
+                            if(n < 14) return '#f1c40f';
+                            if(n < 16) return '#2ecc71';
+                            return '#27ae60';
+                        }),
+                        borderColor: '#2c3e50',
+                        borderWidth: 3,
+                        borderRadius: 15,
+                        barThickness: 35,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {display: false},
+                        title: {
+                            display: true, 
+                            text: '📊 نقاطك بالتفصيل - مشروع Fatima TCSF2', 
+                            font: {size: 22, weight: 'bold', family: 'Poppins'},
+                            color: '#2c3e50',
+                            padding: {top: 10, bottom: 30}
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(44, 62, 80, 0.95)',
+                            titleFont: {size: 14, weight: 'bold'},
+                            bodyFont: {size: 13},
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true, 
+                            max: 20, 
+                            ticks: {
+                                stepSize: 2,
+                                font: {size: 14, weight: 'bold'},
+                                color: '#34495e'
+                            },
+                            grid: {color: 'rgba(0,0,0,0.08)', lineWidth: 2}
+                        },
+                        x: {
+                            ticks: {
+                                font: {size: 13, weight: 'bold'},
+                                color: '#2c3e50',
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {display: false}
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutElastic'
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
