@@ -31,4 +31,117 @@
         .status{font-size:22px;margin:8px 0;font-weight:600}
         .details{font-size:14px;opacity:0.95;margin-top:12px}
         .conseil{background:rgba(255,255,255,0.2);padding:15px;border-radius:10px;margin-top:15px;text-align:left;font-size:14px;line-height:1.6}
-        .conseil strong{display:block;margin-bottom:5px
+        .conseil strong{display:block;margin-bottom:5px;font-size:15px}
+        #chartContainer{margin-top:30px;padding:20px;background:#f8f9fa;border-radius:15px;display:none}
+        canvas{max-width:100%}
+        .footer{text-align:center;margin-top:20px;font-size:12px;color:#95a5a6}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🎓 Calculatrice de Moyenne Intelligente</h1>
+            <p class="subtitle">Projet Fatima - Tronc Commun Scientifique</p>
+
+            <div class="matiere"><div class="matiere-info"><span class="icon">📐</span><span class="matiere-name">Mathématiques</span><span class="coef-badge">Coef 4</span></div><input type="number" id="m1" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">⚡</span><span class="matiere-name">Physique-Chimie</span><span class="coef-badge">Coef 4</span></div><input type="number" id="m2" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">🌱</span><span class="matiere-name">SVT</span><span class="coef-badge">Coef 4</span></div><input type="number" id="m3" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">🇫🇷</span><span class="matiere-name">Français</span><span class="coef-badge">Coef 3</span></div><input type="number" id="m4" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">🇬🇧</span><span class="matiere-name">Anglais</span><span class="coef-badge">Coef 3</span></div><input type="number" id="m5" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">📖</span><span class="matiere-name">Langue Arabe</span><span class="coef-badge">Coef 2</span></div><input type="number" id="m6" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">🗺️</span><span class="matiere-name">Histoire-Géo</span><span class="coef-badge">Coef 2</span></div><input type="number" id="m7" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">🤔</span><span class="matiere-name">Philosophie</span><span class="coef-badge">Coef 2</span></div><input type="number" id="m8" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">💻</span><span class="matiere-name">Informatique</span><span class="coef-badge">Coef 2</span></div><input type="number" id="m9" min="0" max="20" step="0.25" placeholder="--"></div>
+            <div class="matiere"><div class="matiere-info"><span class="icon">⚽</span><span class="matiere-name">Éducation Physique</span><span class="coef-badge">Coef 2</span></div><input type="number" id="m10" min="0" max="20" step="0.25" placeholder="--"></div>
+
+            <button class="btn" onclick="calculate()">✨ Calculer + Conseils + Graphique</button>
+
+            <div id="result"></div>
+            <div id="chartContainer"><canvas id="myChart"></canvas></div>
+            <div class="footer">Développé avec ❤️ par Fatima TCSF2</div>
+        </div>
+    </div>
+
+<script>
+let myChart = null;
+
+function getConseil(moy){
+    if(moy >= 16) return `<strong>🏆 Excellent! Mention Très Bien</strong>Continue comme ça! Tu maîtrises parfaitement. Tu peux viser les classes préparatoires ou les grandes écoles.`;
+    if(moy >= 14) return `<strong>🌟 Très Bien!</strong>Bravo! Travaille encore un peu les matières scientifiques pour atteindre 16. Tu es sur la bonne voie.`;
+    if(moy >= 12) return `<strong>👍 Bien!</strong>C'est bien, mais tu peux faire mieux. Concentre-toi sur Maths/Physique/SVT car coef 4. Révise régulièrement.`;
+    if(moy >= 10) return `<strong>✅ Admis - Assez Bien</strong>Tu passes de justesse. Attention! Il faut renforcer les matières à fort coefficient. Fais plus d'exercices.`;
+    if(moy >= 8) return `<strong>⚠️ Insuffisant</strong>Il te manque ${ (10-moy).toFixed(2) } points. Travaille surtout Maths, Physique, SVT. Demande de l'aide à tes profs.`;
+    return `<strong>❌ Échec</strong>Ne te décourage pas! Identifie tes faiblesses dans les matières coef 4. Commence par des cours de soutien. Tu peux y arriver!`;
+}
+
+function calculate(){
+    const inputs = ['m1','m2','m3','m4','m5','m6','m7','m8','m9','m10'].map(id => +document.getElementById(id).value || 0);
+    const coefs = [4,4,4,3,3,2,2,2];
+    const labels = ['Maths','Physique','SVT','Français','Anglais','Arabe','Hist-Géo','Philo','Info','EPS'];
+    const icons = ['📐','⚡','🌱','🇫🇷','🇬🇧','📖','🗺️','🤔','💻','⚽'];
+    const sumCoef = 28;
+    let total = 0;
+
+    for(let i=0;i<10;i++) total += inputs[i] * coefs[i];
+    const moyenne = (total/sumCoef).toFixed(2);
+    const resultDiv = document.getElementById('result');
+    const conseil = getConseil(moyenne);
+
+    resultDiv.style.display = 'block';
+    if(moyenne >= 10){
+        resultDiv.className = 'success';
+        resultDiv.innerHTML = `
+            <div class="status">🎉 Félicitations - Admis!</div>
+            <div class="moyenne">${moyenne} / 20</div>
+            <div class="details">Total: ${total} pts | Coef: ${sumCoef}</div>
+            <div class="conseil">${conseil}</div>
+        `;
+    } else {
+        resultDiv.className = 'danger';
+        resultDiv.innerHTML = `
+            <div class="status">😔 Désolé - Ajourné</div>
+            <div class="moyenne">${moyenne} / 20</div>
+            <div class="details">Total: ${total} pts | Coef: ${sumCoef}</div>
+            <div class="conseil">${conseil}</div>
+        `;
+    }
+
+    document.getElementById('chartContainer').style.display = 'block';
+    if(myChart) myChart.destroy();
+
+    const ctx = document.getElementById('myChart');
+    const colors = inputs.map(n => {
+        if(n >= 16) return '#27ae60';
+        if(n >= 12) return '#2ecc71';
+        if(n >= 10) return '#f39c12';
+        return '#e74c3c';
+    });
+
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels.map((l,i) => `${icons[i]} ${l}`),
+            datasets: [{
+                label: 'Note / 20',
+                data: inputs,
+                backgroundColor: colors,
+                borderColor: '#2c3e50',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {display: false},
+                title: {display: true, text: 'Analyse Détaillée des Notes', font: {size: 18, weight: 'bold', family: 'Poppins'}}
+            },
+            scales: {
+                y: {beginAtZero: true, max: 20, ticks: {stepSize: 4}}
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>
